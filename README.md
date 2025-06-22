@@ -2,8 +2,6 @@
 
 A simple logger for Go CLI applications. `clilog` is a partial drop-in replacement for the standard `log` package, with support for log levels, formatting, colorization, and timestamps — all with zero dependencies.
 
-```
-
 ## Goals
 
 - **Human-readable CLI logs**  
@@ -41,14 +39,10 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
   This logger is intentionally agnostic — it doesn’t integrate with Viper, Cobra, or slog adapters.
 
 
-```
-
 ## Installation
 
 ```bash
 go get github.com/lukemassa/clilog
-```
-
 ```
 
 ## Example
@@ -73,8 +67,6 @@ func main() {
 }
 ```
 
-```
-
 ## Example Output
 
 ```
@@ -85,8 +77,6 @@ func main() {
 ```
 
 If color is enabled, the timestamp and log level will be colorized based on severity.
-
-```
 
 ## Log Levels
 
@@ -102,8 +92,6 @@ Set the minimum level to show with:
 
 ```go
 log.SetLogLevel(log.LevelWarn) // Only warn and above will print
-```
-
 ```
 
 ## Formatting
@@ -123,17 +111,13 @@ log.SetFormat(`{{ .Time }} [{{ .LevelCode }}] {{ .Message }}`)
 
 Invalid template variables will return an error at `SetFormat` time.
 
-```
-
-## Configuration
+## Other Configuration
 
 ```go
 log.SetLogLevel(log.LevelInfo)                      // Minimum level to print
 log.SetDisableColor(true)                           // Disable color entirely
 log.SetTimestampFormat("2006-01-02 15:04:05.000")   // Custom time layout
 log.SetOutput(os.Stdout)                            // Redirect output
-```
-
 ```
 
 ## License
