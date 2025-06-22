@@ -16,12 +16,11 @@ const (
 	LevelFatal
 )
 
-const defaultTemplate = `{{ .Time }} {{ .LevelCode }} {{ .Message }}`
+const defaultTemplate = `{{ .Time | timef "15:04:05" }} {{ .LevelCode }} {{ .Message }}`
 
 var globalLogger = logger{
 	level:        LevelInfo,
 	colorEnabled: true,
-	timeFormat:   "2006/01/02 15:04:05.000",
 	formatter:    mustNewFormatter(defaultTemplate),
 	output:       os.Stderr,
 }
@@ -30,10 +29,6 @@ var globalLogger = logger{
 
 func SetLogLevel(level Level) {
 	globalLogger.level = level
-}
-
-func SetTimestampFormat(format string) {
-	globalLogger.timeFormat = format
 }
 
 func SetFormat(format string) error {

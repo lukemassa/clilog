@@ -42,7 +42,6 @@ func TestBasicLogging(t *testing.T) {
 	var exampleLogger = logger{
 		level:        LevelInfo,
 		colorEnabled: false,
-		timeFormat:   "", // Skip checking time for now
 		formatter:    mustNewFormatter(`{{ .LevelCode }} {{ .Message }}`),
 		output:       &buf,
 	}

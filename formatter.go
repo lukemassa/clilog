@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+	"time"
 )
 
 // Internal representation of the configuration of a logger.
@@ -17,12 +18,19 @@ type formatter struct {
 type logTemplateData struct {
 	LevelCode string
 	LevelName string
-	Time      string
+	Time      time.Time
 	Message   string
 }
 
 func newFormatter(format string) (formatter, error) {
-	t, err := template.New("log").Parse(format)
+
+	funcMap := template.FuncMap{
+		"timef": func(layout string, t time.Time) string {
+			return t.Format(layout)
+		},
+	}
+
+	t, err := template.New("log").Funcs(funcMap).Parse(format)
 	if err != nil {
 		return formatter{}, err
 	}
@@ -31,7 +39,7 @@ func newFormatter(format string) (formatter, error) {
 	test := logTemplateData{
 		LevelCode: "D",
 		LevelName: "DEBUG ",
-		Time:      "2006/01/02 15:04:05",
+		Time:      now(),
 		Message:   "test message",
 	}
 
@@ -39,8 +47,9 @@ func newFormatter(format string) (formatter, error) {
 	if err := t.Execute(&b, test); err != nil {
 		return formatter{}, fmt.Errorf("invalid template: %w", err)
 	}
+
 	return formatter{
-		tmpl: t,
+		tmpl: t.Funcs(funcMap),
 	}, nil
 }
 

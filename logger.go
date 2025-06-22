@@ -16,7 +16,6 @@ var now = time.Now
 type logger struct {
 	level        Level
 	colorEnabled bool
-	timeFormat   string
 	formatter    formatter
 	output       io.Writer
 }
@@ -62,7 +61,7 @@ func (l logger) logf(level Level, msg string) {
 		return
 	}
 
-	ts := now().Format(l.timeFormat)
+	ts := now()
 
 	levelCode := level.code()
 	levelName := level.name()
@@ -71,7 +70,7 @@ func (l logger) logf(level Level, msg string) {
 		color := colorFor(level)
 		levelCode = color + levelCode + "\033[0m"
 		levelName = color + levelName + "\033[0m"
-		ts = color + ts + "\033[0m"
+		//ts = color + ts + "\033[0m"
 	}
 
 	data := logTemplateData{
