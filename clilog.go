@@ -70,47 +70,6 @@ func (l Level) name() string {
 	}
 }
 
-func SetLogLevel(level Level) {
-	currentLevel = level
-}
-
-func SetTimestampFormat(format string) {
-	timeFormat = format
-}
-
-func SetFormat(format string) error {
-	t, err := template.New("log").Parse(format)
-	if err != nil {
-		return err
-	}
-
-	// Validate template by rendering with dummy data
-	test := logTemplateData{
-		LevelCode: "D",
-		LevelName: "DEBUG ",
-		Time:      "2006/01/02 15:04:05",
-		Message:   "test message",
-	}
-
-	var b strings.Builder
-	if err := t.Execute(&b, test); err != nil {
-		return fmt.Errorf("invalid template: %w", err)
-	}
-
-	tmpl = t
-	return nil
-}
-
-func SetDisableColor(disable bool) {
-	colorEnabled = !disable
-}
-
-func SetOutput(w io.Writer) {
-	if w != nil {
-		output = w
-	}
-}
-
 // --- Core logging function ---
 
 func logf(level Level, msg string) {
@@ -159,7 +118,50 @@ func colorFor(level Level) string {
 	}
 }
 
-// --- Public helpers ---
+// --- Configuration ---
+
+func SetLogLevel(level Level) {
+	currentLevel = level
+}
+
+func SetTimestampFormat(format string) {
+	timeFormat = format
+}
+
+func SetFormat(format string) error {
+	t, err := template.New("log").Parse(format)
+	if err != nil {
+		return err
+	}
+
+	// Validate template by rendering with dummy data
+	test := logTemplateData{
+		LevelCode: "D",
+		LevelName: "DEBUG ",
+		Time:      "2006/01/02 15:04:05",
+		Message:   "test message",
+	}
+
+	var b strings.Builder
+	if err := t.Execute(&b, test); err != nil {
+		return fmt.Errorf("invalid template: %w", err)
+	}
+
+	tmpl = t
+	return nil
+}
+
+func SetDisableColor(disable bool) {
+	colorEnabled = !disable
+}
+
+func SetOutput(w io.Writer) {
+	if w != nil {
+		output = w
+	}
+}
+
+// --- Public logging helpers ---
 
 func Debug(args ...any)                 { logf(LevelDebug, fmt.Sprint(args...)) }
 func Debugf(format string, args ...any) { logf(LevelDebug, fmt.Sprintf(format, args...)) }
