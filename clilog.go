@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"text/template"
-	"time"
 )
 
 type Level int
@@ -21,159 +19,58 @@ const (
 
 const defaultTemplate = `{{ .Time }} {{ .LevelCode }} {{ .Message }}`
 
-var (
-	currentLevel Level              = LevelInfo
-	colorEnabled bool               = true
-	timeFormat   string             = "2006/01/02 15:04:05.000"
-	tmpl         *template.Template = template.Must(template.New("log").Parse(defaultTemplate))
-	output       io.Writer          = os.Stderr
-)
-
-type logTemplateData struct {
-	LevelCode string
-	LevelName string
-	Time      string
-	Message   string
-}
-
-func (l Level) code() string {
-	switch l {
-	case LevelDebug:
-		return "D"
-	case LevelInfo:
-		return "I"
-	case LevelWarn:
-		return "W"
-	case LevelError:
-		return "E"
-	case LevelFatal:
-		return "F"
-	default:
-		return "?"
-	}
-}
-
-func (l Level) name() string {
-	switch l {
-	case LevelDebug:
-		return "DEBUG "
-	case LevelInfo:
-		return "INFO  "
-	case LevelWarn:
-		return "WARN  "
-	case LevelError:
-		return "ERROR "
-	case LevelFatal:
-		return "FATAL "
-	default:
-		return "INVAL " // fallback, same width
-	}
-}
-
-// --- Core logging function ---
-
-func logf(level Level, msg string) {
-	if level < currentLevel {
-		return
-	}
-
-	ts := time.Now().Format(timeFormat)
-
-	levelCode := level.code()
-	levelName := level.name()
-
-	if colorEnabled {
-		color := colorFor(level)
-		levelCode = color + levelCode + "\033[0m"
-		levelName = color + levelName + "\033[0m"
-		ts = color + ts + "\033[0m"
-	}
-
-	data := logTemplateData{
-		LevelCode: levelCode,
-		LevelName: levelName,
-		Time:      ts,
-		Message:   msg,
-	}
-
-	var b strings.Builder
-	_ = tmpl.Execute(&b, data)
-	fmt.Fprintln(output, b.String())
-}
-
-func colorFor(level Level) string {
-	switch level {
-	case LevelDebug:
-		return "\033[36m" // cyan
-	case LevelInfo:
-		return "\033[32m" // green
-	case LevelWarn:
-		return "\033[33m" // yellow
-	case LevelError:
-		return "\033[31m" // red
-	case LevelFatal:
-		return "\033[35m" // magenta
-	default:
-		return ""
-	}
+var globalLogger = logger{
+	level:        LevelInfo,
+	colorEnabled: true,
+	timeFormat:   "2006/01/02 15:04:05.000",
+	tmpl:         template.Must(template.New("log").Parse(defaultTemplate)),
+	output:       os.Stderr,
 }
 
 // --- Configuration ---
 
 func SetLogLevel(level Level) {
-	currentLevel = level
+	globalLogger.level = level
 }
 
 func SetTimestampFormat(format string) {
-	timeFormat = format
+	globalLogger.timeFormat = format
 }
 
 func SetFormat(format string) error {
-	t, err := template.New("log").Parse(format)
-	if err != nil {
-		return err
-	}
-
-	// Validate template by rendering with dummy data
-	test := logTemplateData{
-		LevelCode: "D",
-		LevelName: "DEBUG ",
-		Time:      "2006/01/02 15:04:05",
-		Message:   "test message",
-	}
-
-	var b strings.Builder
-	if err := t.Execute(&b, test); err != nil {
-		return fmt.Errorf("invalid template: %w", err)
-	}
-
-	tmpl = t
-	return nil
+	return globalLogger.setFormat(format)
 }
 
 func SetDisableColor(disable bool) {
-	colorEnabled = !disable
+	globalLogger.colorEnabled = !disable
 }
 
 func SetOutput(w io.Writer) {
 	if w != nil {
-		output = w
+		globalLogger.output = w
 	}
 }
 
 // --- Public logging helpers ---
 
-func Debug(args ...any)                 { logf(LevelDebug, fmt.Sprint(args...)) }
-func Debugf(format string, args ...any) { logf(LevelDebug, fmt.Sprintf(format, args...)) }
+func Debug(args ...any)                 { globalLogger.logf(LevelDebug, fmt.Sprint(args...)) }
+func Debugf(format string, args ...any) { globalLogger.logf(LevelDebug, fmt.Sprintf(format, args...)) }
 
-func Info(args ...any)                 { logf(LevelInfo, fmt.Sprint(args...)) }
-func Infof(format string, args ...any) { logf(LevelInfo, fmt.Sprintf(format, args...)) }
+func Info(args ...any)                 { globalLogger.logf(LevelInfo, fmt.Sprint(args...)) }
+func Infof(format string, args ...any) { globalLogger.logf(LevelInfo, fmt.Sprintf(format, args...)) }
 
-func Warn(args ...any)                 { logf(LevelWarn, fmt.Sprint(args...)) }
-func Warnf(format string, args ...any) { logf(LevelWarn, fmt.Sprintf(format, args...)) }
+func Warn(args ...any)                 { globalLogger.logf(LevelWarn, fmt.Sprint(args...)) }
+func Warnf(format string, args ...any) { globalLogger.logf(LevelWarn, fmt.Sprintf(format, args...)) }
 
-func Error(args ...any)                 { logf(LevelError, fmt.Sprint(args...)) }
-func Errorf(format string, args ...any) { logf(LevelError, fmt.Sprintf(format, args...)) }
+func Error(args ...any)                 { globalLogger.logf(LevelError, fmt.Sprint(args...)) }
+func Errorf(format string, args ...any) { globalLogger.logf(LevelError, fmt.Sprintf(format, args...)) }
 
-func Fatal(args ...any)                 { logf(LevelFatal, fmt.Sprint(args...)); os.Exit(1) }
-func Fatalf(format string, args ...any) { logf(LevelFatal, fmt.Sprintf(format, args...)); os.Exit(1) }
+func Fatal(args ...any) {
+	globalLogger.logf(LevelFatal, fmt.Sprint(args...))
+	os.Exit(1)
+}
+
+func Fatalf(format string, args ...any) {
+	globalLogger.logf(LevelFatal, fmt.Sprintf(format, args...))
+	os.Exit(1)
+}

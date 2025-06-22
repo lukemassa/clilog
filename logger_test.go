@@ -25,7 +25,8 @@ func TestSetFormat(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.format, func(t *testing.T) {
-			actualErr := SetFormat(tc.format)
+			l := logger{}
+			actualErr := l.setFormat(tc.format)
 			if tc.expectedErr == "" {
 				assert.NoError(t, actualErr)
 			} else {
