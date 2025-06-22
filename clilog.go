@@ -175,4 +175,3 @@ func Errorf(format string, args ...any) { logf(LevelError, fmt.Sprintf(format, a
 
 func Fatal(args ...any)                 { logf(LevelFatal, fmt.Sprint(args...)); os.Exit(1) }
 func Fatalf(format string, args ...any) { logf(LevelFatal, fmt.Sprintf(format, args...)); os.Exit(1) }
-
