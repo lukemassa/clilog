@@ -19,7 +19,24 @@ const (
 	LevelFatal
 )
 
-func (l Level) Code() string {
+const defaultTemplate = `{{ .Time }} {{ .LevelCode }} {{ .Message }}`
+
+var (
+	currentLevel Level              = LevelInfo
+	colorEnabled bool               = true
+	timeFormat   string             = "2006/01/02 15:04:05.000"
+	tmpl         *template.Template = template.Must(template.New("log").Parse(defaultTemplate))
+	output       io.Writer          = os.Stderr
+)
+
+type logTemplateData struct {
+	LevelCode string
+	LevelName string
+	Time      string
+	Message   string
+}
+
+func (l Level) code() string {
 	switch l {
 	case LevelDebug:
 		return "D"
@@ -36,7 +53,7 @@ func (l Level) Code() string {
 	}
 }
 
-func (l Level) Name() string {
+func (l Level) name() string {
 	switch l {
 	case LevelDebug:
 		return "DEBUG "
@@ -51,23 +68,6 @@ func (l Level) Name() string {
 	default:
 		return "INVAL " // fallback, same width
 	}
-}
-
-var (
-	currentLevel           = LevelInfo
-	colorEnabled           = true
-	timeFormat             = "2006/01/02 15:04:05.000"
-	tmpl                   = template.Must(template.New("log").Parse(defaultTemplate))
-	output       io.Writer = os.Stderr
-)
-
-const defaultTemplate = `{{ .Time }} {{ .LevelCode }} {{ .Message }}`
-
-type logTemplateData struct {
-	LevelCode string
-	LevelName string
-	Time      string
-	Message   string
 }
 
 func SetLogLevel(level Level) {
@@ -120,8 +120,8 @@ func logf(level Level, msg string) {
 
 	ts := time.Now().Format(timeFormat)
 
-	levelCode := level.Code()
-	levelName := level.Name()
+	levelCode := level.code()
+	levelName := level.name()
 
 	if colorEnabled {
 		color := colorFor(level)
