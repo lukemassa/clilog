@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"text/template"
 )
 
 type Level int
@@ -23,7 +22,7 @@ var globalLogger = logger{
 	level:        LevelInfo,
 	colorEnabled: true,
 	timeFormat:   "2006/01/02 15:04:05.000",
-	tmpl:         template.Must(template.New("log").Parse(defaultTemplate)),
+	formatter:    mustNewFormatter(defaultTemplate),
 	output:       os.Stderr,
 }
 
@@ -38,7 +37,12 @@ func SetTimestampFormat(format string) {
 }
 
 func SetFormat(format string) error {
-	return globalLogger.setFormat(format)
+	f, err := newFormatter(format)
+	if err != nil {
+		return err
+	}
+	globalLogger.formatter = f
+	return nil
 }
 
 func SetDisableColor(disable bool) {

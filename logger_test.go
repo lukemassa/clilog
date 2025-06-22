@@ -3,7 +3,6 @@ package clilog
 import (
 	"bytes"
 	"testing"
-	"text/template"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -27,8 +26,7 @@ func TestSetFormat(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.format, func(t *testing.T) {
-			l := logger{}
-			actualErr := l.setFormat(tc.format)
+			_, actualErr := newFormatter(tc.format)
 			if tc.expectedErr == "" {
 				assert.NoError(t, actualErr)
 			} else {
@@ -45,7 +43,7 @@ func TestBasicLogging(t *testing.T) {
 		level:        LevelInfo,
 		colorEnabled: false,
 		timeFormat:   "", // Skip checking time for now
-		tmpl:         template.Must(template.New("log").Parse(`{{ .LevelCode }} {{ .Message }}`)),
+		formatter:    mustNewFormatter(`{{ .LevelCode }} {{ .Message }}`),
 		output:       &buf,
 	}
 	exampleLogger.logf(LevelInfo, "hello")

@@ -3,10 +3,11 @@ package clilog
 import (
 	"fmt"
 	"io"
-	"strings"
-	"text/template"
 	"time"
 )
+
+// So we can override in tests
+var now = time.Now
 
 // Internal representation of the configuration of a logger.
 // It's not intended that users will be creating their own loggers (see "Non Goals"),
@@ -16,15 +17,8 @@ type logger struct {
 	level        Level
 	colorEnabled bool
 	timeFormat   string
-	tmpl         *template.Template
+	formatter    formatter
 	output       io.Writer
-}
-
-type logTemplateData struct {
-	LevelCode string
-	LevelName string
-	Time      string
-	Message   string
 }
 
 func (l Level) code() string {
@@ -60,28 +54,6 @@ func (l Level) name() string {
 		return "INVAL" // fallback, same width
 	}
 }
-func (l *logger) setFormat(format string) error {
-	t, err := template.New("log").Parse(format)
-	if err != nil {
-		return err
-	}
-
-	// Validate template by rendering with dummy data
-	test := logTemplateData{
-		LevelCode: "D",
-		LevelName: "DEBUG ",
-		Time:      "2006/01/02 15:04:05",
-		Message:   "test message",
-	}
-
-	var b strings.Builder
-	if err := t.Execute(&b, test); err != nil {
-		return fmt.Errorf("invalid template: %w", err)
-	}
-
-	l.tmpl = t
-	return nil
-}
 
 // --- Core logging function ---
 
@@ -90,7 +62,7 @@ func (l logger) logf(level Level, msg string) {
 		return
 	}
 
-	ts := time.Now().Format(l.timeFormat)
+	ts := now().Format(l.timeFormat)
 
 	levelCode := level.code()
 	levelName := level.name()
@@ -108,10 +80,7 @@ func (l logger) logf(level Level, msg string) {
 		Time:      ts,
 		Message:   msg,
 	}
-
-	var b strings.Builder
-	_ = l.tmpl.Execute(&b, data)
-	fmt.Fprintln(l.output, b.String())
+	fmt.Fprintln(l.output, l.formatter.format(data))
 }
 
 func colorFor(level Level) string {
