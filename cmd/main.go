@@ -1,13 +1,13 @@
 package main
 
-import (
-	log "github.com/lukemassa/clilog"
-)
+import log "github.com/lukemassa/clilog"
 
 func main() {
 	log.SetLogLevel(log.LevelDebug)
-	log.Debug("starting up")
-	log.Debugf("Initialing %s", "subsystems")
+
+	log.Infof("Hello %s", "World")
+	log.Debug("initializing subsystems")
+
 	log.Warn("deprecated feature in use")
-	log.Error("could not read config file")
+	log.Errorf("could not read config file")
 }
