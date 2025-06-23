@@ -8,47 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetFormat(t *testing.T) {
-	cases := []struct {
-		format      string
-		expectedErr string
-	}{
-		{
-			format:      "foo{{",
-			expectedErr: "unclosed action",
-		},
-		{
-			format:      "{{ .Foobar }}",
-			expectedErr: "can't evaluate field Foobar",
-		},
-		{
-			format:      "{{ .Time | foobar }}",
-			expectedErr: "function \"foobar\" not defined",
-		},
-		{
-			format: "{{ .Time }}",
-		},
-		{
-			format: `{{ .Time | timef "2006" }}`,
-		},
-		{
-			format:      `{{ .Time | timef 123 }}`,
-			expectedErr: "expected string; found 123",
-		},
-	}
-	for _, tc := range cases {
-		t.Run(tc.format, func(t *testing.T) {
-			_, actualErr := newFormatter(tc.format)
-			if tc.expectedErr == "" {
-				assert.NoError(t, actualErr)
-			} else {
-				assert.ErrorContains(t, actualErr, tc.expectedErr)
-			}
-		})
-	}
-}
-
-func TestLogging(t *testing.T) {
+func TestLogf(t *testing.T) {
 	originalNow := now
 	defer func() { now = originalNow }() // Restore after test
 
@@ -57,7 +17,6 @@ func TestLogging(t *testing.T) {
 	}
 	cases := []struct {
 		description    string
-		format         string
 		currentLevel   Level
 		messageLevel   Level
 		message        string
@@ -65,43 +24,24 @@ func TestLogging(t *testing.T) {
 	}{
 		{
 			description:    "Basic log",
-			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" }} {{ .Message }}`,
 			currentLevel:   LevelInfo,
 			messageLevel:   LevelInfo,
 			message:        "Hello!",
-			expectedOutput: "I 2025 Hello!\n",
+			expectedOutput: "I 2025/01/01 00:00:00.000 Hello!\n",
 		},
 		{
 			description:    "Do not log debug if set to info",
-			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" }} {{ .Message }}`,
 			currentLevel:   LevelInfo,
 			messageLevel:   LevelDebug,
 			message:        "Hello!",
 			expectedOutput: "",
 		},
 		{
-			description:    "Do not debug if set to debug",
-			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" }} {{ .Message }}`,
+			description:    "Do debug if set to debug",
 			currentLevel:   LevelDebug,
 			messageLevel:   LevelDebug,
 			message:        "Hello!",
-			expectedOutput: "D 2025 Hello!\n",
-		},
-		{
-			description:    "Log in color",
-			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" | color .Level }} {{ .Message }}`,
-			currentLevel:   LevelInfo,
-			messageLevel:   LevelInfo,
-			message:        "Hello!",
-			expectedOutput: "I \x1b[32m2025\x1b[0m Hello!\n",
-		},
-		{
-			description:    "Log with level name",
-			format:         `{{ .Level }} {{ .Message }}`,
-			currentLevel:   LevelInfo,
-			messageLevel:   LevelInfo,
-			message:        "Hello!",
-			expectedOutput: "INFO  Hello!\n",
+			expectedOutput: "D 2025/01/01 00:00:00.000 Hello!\n",
 		},
 	}
 	for _, tc := range cases {
@@ -109,7 +49,7 @@ func TestLogging(t *testing.T) {
 			var buf bytes.Buffer
 			var exampleLogger = logger{
 				level:     tc.currentLevel,
-				formatter: mustNewFormatter(tc.format),
+				formatter: mustNewFormatter(DefaultFormatNoColor),
 				output:    &buf,
 			}
 			exampleLogger.logf(tc.messageLevel, tc.message)
@@ -117,5 +57,4 @@ func TestLogging(t *testing.T) {
 			assert.Equal(t, tc.expectedOutput, logWritten)
 		})
 	}
-
 }

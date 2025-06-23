@@ -88,6 +88,23 @@ func colorFor(level Level) string {
 	}
 }
 
+func (l Level) String() string {
+	switch l {
+	case LevelDebug:
+		return "DEBUG"
+	case LevelInfo:
+		return "INFO "
+	case LevelWarn:
+		return "WARN "
+	case LevelError:
+		return "ERROR"
+	case LevelFatal:
+		return "FATAL"
+	default:
+		return "INVAL" // fallback, same width
+	}
+}
+
 func (l Level) Abbreviation() string {
 	switch l {
 	case LevelDebug:

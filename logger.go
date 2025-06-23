@@ -19,42 +19,6 @@ type logger struct {
 	output    io.Writer
 }
 
-func (l Level) code() string {
-	switch l {
-	case LevelDebug:
-		return "D"
-	case LevelInfo:
-		return "I"
-	case LevelWarn:
-		return "W"
-	case LevelError:
-		return "E"
-	case LevelFatal:
-		return "F"
-	default:
-		return "?"
-	}
-}
-
-func (l Level) String() string {
-	switch l {
-	case LevelDebug:
-		return "DEBUG"
-	case LevelInfo:
-		return "INFO "
-	case LevelWarn:
-		return "WARN "
-	case LevelError:
-		return "ERROR"
-	case LevelFatal:
-		return "FATAL"
-	default:
-		return "INVAL" // fallback, same width
-	}
-}
-
-// --- Core logging function ---
-
 func (l logger) logf(level Level, msg string) {
 	if level < l.level {
 		return
