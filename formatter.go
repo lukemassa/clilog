@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-// Internal representation of the configuration of a logger.
-// It's not intended that users will be creating their own loggers (see "Non Goals"),
-// this is split out mostly for modularity, and to aid in testing.
-// All logging functionality goes through the globalLogger
 type formatter struct {
 	tmpl *template.Template
 }
