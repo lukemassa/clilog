@@ -11,7 +11,7 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
   Uses text templates to control layout (`{{ .Level }} {{ .Message }}`), with support for color.
 
 - **Minimal API, partial drop-in for `log`**  
-  Functions like `Info`, `Infof`, `Fatalf` behave like standard `log.Print*` but add levels and formatting.
+  Functions like `Info`, `Infof`, `Fatalf` behave like standard `log.Print*` but add levels and formatting via simple Set* functions.
 
 - **Single global logger**  
   No logger instances or hierarchies — one logger, one output, meant for short-lived CLI tools.
