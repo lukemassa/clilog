@@ -57,13 +57,9 @@ import log "github.com/lukemassa/clilog"
 
 func main() {
 	log.SetLogLevel(log.LevelDebug)
-	log.SetDisableColor(false)
 
 	log.Infof("starting up")
 	log.Debug("initializing subsystems")
-
-	// Optional custom format
-	log.SetFormat(`{{ .Time }} {{ .LevelName }} {{ .Message }}`)
 
 	log.Warn("deprecated feature in use")
 	log.Errorf("could not read config file")
@@ -73,10 +69,10 @@ func main() {
 ## Example Output
 
 ```
-2025/06/22 16:08:19.103 D starting up
-2025/06/22 16:08:19.104 D initializing subsystems
-2025/06/22 16:08:19.105 W deprecated feature in use
-2025/06/22 16:08:19.106 E could not read config file
+I 2025/06/22 22:04:37.820 starting up
+D 2025/06/22 22:04:37.820 Initialing subsystems
+W 2025/06/22 22:04:37.820 deprecated feature in use
+E 2025/06/22 22:04:37.820 could not read config file
 ```
 
 If color is enabled, the timestamp and log level will be colorized based on severity.
@@ -99,28 +95,24 @@ log.SetLogLevel(log.LevelWarn) // Only warn and above will print
 
 ## Formatting
 
-Use Go’s `text/template` syntax to control log layout.
+This logger uses Go’s `text/template` syntax to customize the layout of each log line.
 
-Available fields:
-- `{{ .Time }}` — formatted timestamp (millisecond precision)
-- `{{ .LevelCode }}` — short level code like `D`, `W`, `F`
-- `{{ .LevelName }}` — padded full name: `DEBUG `, `ERROR `, etc.
-- `{{ .Message }}` — your actual log content
+### Available fields
 
-Example format:
+- `{{ .Time }}` — the raw `time.Time` value (you’ll usually format this with `timef`)
+- `{{ .Level }}` — the log level enum (e.g. `LevelInfo`, `LevelError`)
+- `{{ .Message }}` — the actual log message content
+
+### Template functions
+
+- `timef "<layout>"` — formats a `time.Time` using Go’s `Time.Format` layout string
+- `color <level>` — adds ANSI color codes based on the level
+- `abbrev` — converts a `Level` to a single-letter abbreviation (e.g. `D`, `I`, `W`, `E`, `F`)
+
+### Example
+
 ```go
-log.SetFormat(`{{ .Time }} [{{ .LevelCode }}] {{ .Message }}`)
-```
-
-Invalid template variables will return an error at `SetFormat` time.
-
-## Other Configuration
-
-```go
-log.SetLogLevel(log.LevelInfo)                      // Minimum level to print
-log.SetDisableColor(true)                           // Disable color entirely
-log.SetTimestampFormat("2006-01-02 15:04:05.000")   // Custom time layout
-log.SetOutput(os.Stdout)                            // Redirect output
+log.SetFormat(`{{ .Level | abbrev }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`)
 ```
 
 ## License

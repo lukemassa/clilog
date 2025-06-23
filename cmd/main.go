@@ -5,5 +5,9 @@ import (
 )
 
 func main() {
-	log.Infof("Hello %s", "World")
+	log.SetLogLevel(log.LevelDebug)
+	log.Debug("starting up")
+	log.Debugf("Initialing %s", "subsystems")
+	log.Warn("deprecated feature in use")
+	log.Error("could not read config file")
 }
