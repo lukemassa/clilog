@@ -47,7 +47,7 @@ func TestNewFormatter(t *testing.T) {
 	}
 }
 
-func TestFormatter(t *testing.T) {
+func TestFormat(t *testing.T) {
 
 	jan1 := time.Date(2025, time.January, 1, 0, 0, 0, 0, time.Local)
 	cases := []struct {

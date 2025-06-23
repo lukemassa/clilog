@@ -2,8 +2,13 @@ package clilog
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"time"
 )
+
+// So we can override in tests
+var now = time.Now
 
 type Level int
 
@@ -20,10 +25,36 @@ const (
 	DefaultFormatNoColor = `{{ .Level | abbrev }} {{ .Time | timef "2006/01/02 15:04:05.000" }} {{ .Message }}`
 )
 
+// Internal representation of the configuration of a logger.
+// It's not intended that users will be creating their own loggers (see "Non Goals"),
+// it is split out mostly for modularity, and to aid in testing.
+// All logging functionality goes through the globalLogger
+type logger struct {
+	level     Level
+	formatter formatter
+	output    io.Writer
+}
+
+// Specific "logger" we use in all the public logging functions
 var globalLogger = logger{
 	level:     LevelInfo,
 	formatter: mustNewFormatter(DefaultFormat),
 	output:    os.Stderr,
+}
+
+func (l logger) logf(level Level, msg string) {
+	if level < l.level {
+		return
+	}
+
+	ts := now()
+
+	data := logTemplateData{
+		Level:   level,
+		Time:    ts,
+		Message: msg,
+	}
+	fmt.Fprintln(l.output, l.formatter.format(data))
 }
 
 // --- Configuration ---
