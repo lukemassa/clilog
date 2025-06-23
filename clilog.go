@@ -26,8 +26,7 @@ const (
 )
 
 // Internal representation of the configuration of a logger.
-// It's not intended that users will be creating their own loggers (see "Non Goals"),
-// it is split out mostly for modularity, and to aid in testing.
+// It's not intended that users will be creating their own loggers (see "Non Goals"), it is split out mostly for modularity, and to aid in testing.
 // All logging functionality goes through the globalLogger
 type logger struct {
 	level     Level
@@ -47,11 +46,9 @@ func (l logger) logf(level Level, msg string) {
 		return
 	}
 
-	ts := now()
-
 	data := logTemplateData{
 		Level:   level,
-		Time:    ts,
+		Time:    now(),
 		Message: msg,
 	}
 	fmt.Fprintln(l.output, l.formatter.format(data))
