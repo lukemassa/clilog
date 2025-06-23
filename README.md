@@ -58,21 +58,21 @@ import log "github.com/lukemassa/clilog"
 func main() {
 	log.SetLogLevel(log.LevelDebug)
 
-	log.Infof("starting up")
 	log.Debug("initializing subsystems")
+	log.Infof("Hello %s", "World")
 
 	log.Warn("deprecated feature in use")
-	log.Errorf("could not read config file")
+	log.Error("could not read config file")
 }
 ```
 
 ## Example Output
 
 ```
-I 2025/06/22 22:04:37.820 starting up
-D 2025/06/22 22:04:37.820 Initialing subsystems
-W 2025/06/22 22:04:37.820 deprecated feature in use
-E 2025/06/22 22:04:37.820 could not read config file
+D 2025/06/22 22:50:37.130 initializing subsystems
+I 2025/06/22 22:50:37.130 Hello World
+W 2025/06/22 22:50:37.130 deprecated feature in use
+E 2025/06/22 22:50:37.130 could not read config fil
 ```
 
 By default, the timestamp will be colorized based on severity.
