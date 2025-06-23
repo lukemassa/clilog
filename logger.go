@@ -14,10 +14,9 @@ var now = time.Now
 // this is split out mostly for modularity, and to aid in testing.
 // All logging functionality goes through the globalLogger
 type logger struct {
-	level        Level
-	colorEnabled bool
-	formatter    formatter
-	output       io.Writer
+	level     Level
+	formatter formatter
+	output    io.Writer
 }
 
 func (l Level) code() string {
@@ -66,35 +65,12 @@ func (l logger) logf(level Level, msg string) {
 	levelCode := level.code()
 	levelName := level.name()
 
-	if l.colorEnabled {
-		color := colorFor(level)
-		levelCode = color + levelCode + "\033[0m"
-		levelName = color + levelName + "\033[0m"
-		//ts = color + ts + "\033[0m"
-	}
-
 	data := logTemplateData{
 		LevelCode: levelCode,
 		LevelName: levelName,
+		Level:     level,
 		Time:      ts,
 		Message:   msg,
 	}
 	fmt.Fprintln(l.output, l.formatter.format(data))
-}
-
-func colorFor(level Level) string {
-	switch level {
-	case LevelDebug:
-		return "\033[36m" // cyan
-	case LevelInfo:
-		return "\033[32m" // green
-	case LevelWarn:
-		return "\033[33m" // yellow
-	case LevelError:
-		return "\033[31m" // red
-	case LevelFatal:
-		return "\033[35m" // magenta
-	default:
-		return ""
-	}
 }

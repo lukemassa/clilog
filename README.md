@@ -35,6 +35,9 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
 - **Log contexts or tracing metadata**  
   No `WithField`, no `WithContext`, no span propagation. Keep it simple.
 
+- **Performance**
+  Using go's templates makes it flexible and easy to configure, but not performant. It's good enough for a CLI however.
+
 - **Framework integration**  
   This logger is intentionally agnostic — it doesn’t integrate with Viper, Cobra, or slog adapters.
 

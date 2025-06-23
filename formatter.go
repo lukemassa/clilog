@@ -18,6 +18,7 @@ type formatter struct {
 type logTemplateData struct {
 	LevelCode string
 	LevelName string
+	Level     Level
 	Time      time.Time
 	Message   string
 }
@@ -27,6 +28,9 @@ func newFormatter(format string) (formatter, error) {
 	funcMap := template.FuncMap{
 		"timef": func(layout string, t time.Time) string {
 			return t.Format(layout)
+		},
+		"color": func(level Level, s string) string {
+			return colorFor(level) + s + "\033[0m"
 		},
 	}
 
@@ -40,6 +44,7 @@ func newFormatter(format string) (formatter, error) {
 		LevelCode: "D",
 		LevelName: "DEBUG ",
 		Time:      now(),
+		Level:     LevelDebug,
 		Message:   "test message",
 	}
 
@@ -65,4 +70,21 @@ func (f formatter) format(data logTemplateData) string {
 	var b strings.Builder
 	_ = f.tmpl.Execute(&b, data)
 	return b.String()
+}
+
+func colorFor(level Level) string {
+	switch level {
+	case LevelDebug:
+		return "\033[36m" // cyan
+	case LevelInfo:
+		return "\033[32m" // green
+	case LevelWarn:
+		return "\033[33m" // yellow
+	case LevelError:
+		return "\033[31m" // red
+	case LevelFatal:
+		return "\033[35m" // magenta
+	default:
+		return ""
+	}
 }

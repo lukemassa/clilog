@@ -2,7 +2,6 @@ package clilog
 
 import (
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -16,13 +15,15 @@ const (
 	LevelFatal
 )
 
-const defaultTemplate = `{{ .Time | timef "15:04:05" }} {{ .LevelCode }} {{ .Message }}`
+const (
+	DefaultTemplate        = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`
+	DefaultTemplateNoColor = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" }} {{ .Message }}`
+)
 
 var globalLogger = logger{
-	level:        LevelInfo,
-	colorEnabled: true,
-	formatter:    mustNewFormatter(defaultTemplate),
-	output:       os.Stderr,
+	level:     LevelInfo,
+	formatter: mustNewFormatter(DefaultTemplate),
+	output:    os.Stderr,
 }
 
 // --- Configuration ---
@@ -38,16 +39,6 @@ func SetFormat(format string) error {
 	}
 	globalLogger.formatter = f
 	return nil
-}
-
-func SetDisableColor(disable bool) {
-	globalLogger.colorEnabled = !disable
-}
-
-func SetOutput(w io.Writer) {
-	if w != nil {
-		globalLogger.output = w
-	}
 }
 
 // --- Public logging helpers ---
