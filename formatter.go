@@ -16,11 +16,9 @@ type formatter struct {
 }
 
 type logTemplateData struct {
-	LevelCode string
-	LevelName string
-	Level     Level
-	Time      time.Time
-	Message   string
+	Level   Level
+	Time    time.Time
+	Message string
 }
 
 func newFormatter(format string) (formatter, error) {
@@ -32,6 +30,9 @@ func newFormatter(format string) (formatter, error) {
 		"color": func(level Level, s string) string {
 			return colorFor(level) + s + "\033[0m"
 		},
+		"abbrev": func(level Level) string {
+			return level.Abbreviation()
+		},
 	}
 
 	t, err := template.New("log").Funcs(funcMap).Parse(format)
@@ -41,11 +42,9 @@ func newFormatter(format string) (formatter, error) {
 
 	// Validate template by rendering with dummy data
 	test := logTemplateData{
-		LevelCode: "D",
-		LevelName: "DEBUG ",
-		Time:      now(),
-		Level:     LevelDebug,
-		Message:   "test message",
+		Time:    now(),
+		Level:   LevelDebug,
+		Message: "test message",
 	}
 
 	var b strings.Builder
@@ -86,5 +85,22 @@ func colorFor(level Level) string {
 		return "\033[35m" // magenta
 	default:
 		return ""
+	}
+}
+
+func (l Level) Abbreviation() string {
+	switch l {
+	case LevelDebug:
+		return "D"
+	case LevelInfo:
+		return "I"
+	case LevelWarn:
+		return "W"
+	case LevelError:
+		return "E"
+	case LevelFatal:
+		return "F"
+	default:
+		return "?"
 	}
 }

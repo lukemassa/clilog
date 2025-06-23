@@ -65,7 +65,7 @@ func TestLogging(t *testing.T) {
 	}{
 		{
 			description:    "Basic log",
-			format:         `{{ .LevelCode }} {{ .Time | timef "2006" }} {{ .Message }}`,
+			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" }} {{ .Message }}`,
 			currentLevel:   LevelInfo,
 			messageLevel:   LevelInfo,
 			message:        "Hello!",
@@ -73,7 +73,7 @@ func TestLogging(t *testing.T) {
 		},
 		{
 			description:    "Do not log debug if set to info",
-			format:         `{{ .LevelCode }} {{ .Time | timef "2006" }} {{ .Message }}`,
+			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" }} {{ .Message }}`,
 			currentLevel:   LevelInfo,
 			messageLevel:   LevelDebug,
 			message:        "Hello!",
@@ -81,7 +81,7 @@ func TestLogging(t *testing.T) {
 		},
 		{
 			description:    "Do not debug if set to debug",
-			format:         `{{ .LevelCode }} {{ .Time | timef "2006" }} {{ .Message }}`,
+			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" }} {{ .Message }}`,
 			currentLevel:   LevelDebug,
 			messageLevel:   LevelDebug,
 			message:        "Hello!",
@@ -89,11 +89,19 @@ func TestLogging(t *testing.T) {
 		},
 		{
 			description:    "Log in color",
-			format:         `{{ .LevelCode }} {{ .Time | timef "2006" | color .Level }} {{ .Message }}`,
+			format:         `{{ .Level | abbrev }} {{ .Time | timef "2006" | color .Level }} {{ .Message }}`,
 			currentLevel:   LevelInfo,
 			messageLevel:   LevelInfo,
 			message:        "Hello!",
 			expectedOutput: "I \x1b[32m2025\x1b[0m Hello!\n",
+		},
+		{
+			description:    "Log with level name",
+			format:         `{{ .Level }} {{ .Message }}`,
+			currentLevel:   LevelInfo,
+			messageLevel:   LevelInfo,
+			message:        "Hello!",
+			expectedOutput: "INFO  Hello!\n",
 		},
 	}
 	for _, tc := range cases {

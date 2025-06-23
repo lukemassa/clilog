@@ -36,7 +36,7 @@ func (l Level) code() string {
 	}
 }
 
-func (l Level) name() string {
+func (l Level) String() string {
 	switch l {
 	case LevelDebug:
 		return "DEBUG"
@@ -62,15 +62,10 @@ func (l logger) logf(level Level, msg string) {
 
 	ts := now()
 
-	levelCode := level.code()
-	levelName := level.name()
-
 	data := logTemplateData{
-		LevelCode: levelCode,
-		LevelName: levelName,
-		Level:     level,
-		Time:      ts,
-		Message:   msg,
+		Level:   level,
+		Time:    ts,
+		Message: msg,
 	}
 	fmt.Fprintln(l.output, l.formatter.format(data))
 }

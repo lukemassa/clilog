@@ -16,8 +16,8 @@ const (
 )
 
 const (
-	DefaultFormat        = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`
-	DefaultFormatNoColor = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" }} {{ .Message }}`
+	DefaultFormat        = `{{ .Level | abbrev }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`
+	DefaultFormatNoColor = `{{ .Level | abbrev }} {{ .Time | timef "2006/01/02 15:04:05.000" }} {{ .Message }}`
 )
 
 var globalLogger = logger{
