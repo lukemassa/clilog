@@ -1,6 +1,6 @@
 # clilog
 
-A simple logger for Go CLI applications. `clilog` is a partial drop-in replacement for the standard `log` package, with support for log levels, formatting, colorization, and timestamps — all with zero dependencies.
+A simple logger for Go CLI applications. `clilog` is a partial drop-in replacement for the standard `log` package, with support for log levels, formatting, colorization, and timestamps with zero dependencies.
 
 ## Goals
 
@@ -8,7 +8,7 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
   Designed for command-line output, not machines or log aggregators.
 
 - **Formatted log lines**  
-  Uses text templates to control layout (`{{ .Level }} {{ .Message }}`), with support for color
+  Uses text templates to control layout (`{{ .Level }} {{ .Message }}`), with support for color.
 
 - **Minimal API, partial drop-in for `log`**  
   Functions like `Info`, `Infof`, `Fatalf` behave like standard `log.Print*` but add levels and formatting.
@@ -95,7 +95,7 @@ log.SetLogLevel(log.LevelWarn) // Only warn and above will print
 
 ## Formatting
 
-This logger uses Go’s `text/template` syntax to customize the layout of each log line.
+We use Go’s `text/template` syntax to customize the layout of each log line.
 
 ### Available fields
 
@@ -119,7 +119,4 @@ This starts with the abbreviation of the level (i.e. `D` for Debug) followed by 
 
 (Note: this is currently the default format).
 
-## License
-
-MIT
 
