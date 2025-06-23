@@ -8,7 +8,7 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
   Designed for command-line output, not machines or log aggregators.
 
 - **Formatted log lines**  
-  Uses text templates to control layout (`timestamp level message`), with support for color and millisecond timestamps.
+  Uses text templates to control layout (`{{ .Level }} {{ .Message }}`), with support for color
 
 - **Minimal API, partial drop-in for `log`**  
   Functions like `Info`, `Infof`, `Fatalf` behave like standard `log.Print*` but add levels and formatting.
@@ -27,7 +27,7 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
   No JSON, key-value pairs, or slog-style handlers. This is for humans, not log processors.
 
 - **Logging to multiple outputs or files**  
-  Output is a single `io.Writer`, typically `os.Stderr`. No rotation, no sinks.
+  Output is a single `io.Writer`, currently unconfigurably `os.Stderr`. No rotation, no sinks.
 
 - **Runtime log level reconfiguration**  
   You set the log level once — there's no dynamic or context-based level switching.
@@ -35,8 +35,8 @@ A simple logger for Go CLI applications. `clilog` is a partial drop-in replaceme
 - **Log contexts or tracing metadata**  
   No `WithField`, no `WithContext`, no span propagation. Keep it simple.
 
-- **Performance**
-  Using go's templates makes it flexible and easy to configure, but not performant. It's good enough for a CLI however.
+- **Performance**  
+  Template rendering is flexible but not fast. This logger prioritizes readability and configurability over speed — fine for a CLI, but not for high-throughput services.
 
 - **Framework integration**  
   This logger is intentionally agnostic — it doesn’t integrate with Viper, Cobra, or slog adapters.
@@ -75,7 +75,7 @@ W 2025/06/22 22:04:37.820 deprecated feature in use
 E 2025/06/22 22:04:37.820 could not read config file
 ```
 
-If color is enabled, the timestamp and log level will be colorized based on severity.
+By default, the timestamp will be colorized based on severity.
 
 ## Log Levels
 
@@ -114,6 +114,10 @@ This logger uses Go’s `text/template` syntax to customize the layout of each l
 ```go
 log.SetFormat(`{{ .Level | abbrev }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`)
 ```
+
+This starts with the abbreviation of the level (i.e. `D` for Debug) followed by colorized millisecond precision timestamp, followed by the message.
+
+(Note: this is currently the default format).
 
 ## License
 
