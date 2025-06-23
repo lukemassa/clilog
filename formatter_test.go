@@ -82,6 +82,38 @@ func TestFormat(t *testing.T) {
 			message:        "Hello!",
 			expectedOutput: "INFO  Hello!",
 		},
+		{
+			description:    "Warn with default",
+			format:         DefaultFormat,
+			level:          LevelWarn,
+			time:           jan1,
+			message:        "Hello!",
+			expectedOutput: "W \x1b[33m2025/01/01 00:00:00.000\x1b[0m Hello!",
+		},
+		{
+			description:    "Error with default",
+			format:         DefaultFormat,
+			level:          LevelError,
+			time:           jan1,
+			message:        "Hello!",
+			expectedOutput: "E \x1b[31m2025/01/01 00:00:00.000\x1b[0m Hello!",
+		},
+		{
+			description:    "Fatal with default",
+			format:         DefaultFormat,
+			level:          LevelFatal,
+			time:           jan1,
+			message:        "Hello!",
+			expectedOutput: "F \x1b[35m2025/01/01 00:00:00.000\x1b[0m Hello!",
+		},
+		{
+			description:    "Unknown log level with default",
+			format:         DefaultFormat,
+			level:          Level(100),
+			time:           jan1,
+			message:        "Hello!",
+			expectedOutput: "? 2025/01/01 00:00:00.000\x1b[0m Hello!",
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.description, func(t *testing.T) {
