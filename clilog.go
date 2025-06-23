@@ -16,22 +16,24 @@ const (
 )
 
 const (
-	DefaultTemplate        = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`
-	DefaultTemplateNoColor = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" }} {{ .Message }}`
+	DefaultFormat        = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" | color .Level }} {{ .Message }}`
+	DefaultFormatNoColor = `{{ .LevelCode }} {{ .Time | timef "2006/01/02 15:04:05.000" }} {{ .Message }}`
 )
 
 var globalLogger = logger{
 	level:     LevelInfo,
-	formatter: mustNewFormatter(DefaultTemplate),
+	formatter: mustNewFormatter(DefaultFormat),
 	output:    os.Stderr,
 }
 
 // --- Configuration ---
 
+// SetLogLevel sets the log level, so only logs at or above this level will be displayed
 func SetLogLevel(level Level) {
 	globalLogger.level = level
 }
 
+// SetFormat sets the format of the log
 func SetFormat(format string) error {
 	f, err := newFormatter(format)
 	if err != nil {
