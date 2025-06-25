@@ -66,6 +66,7 @@ func SetLogLevel(level Level) {
 func SetFormat(format string) error {
 	f, err := newFormatter(format)
 	if err != nil {
+		Warnf("Unable to update log format to '%s': %v", format, err)
 		return err
 	}
 	globalLogger.formatter = f
