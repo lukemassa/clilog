@@ -43,7 +43,6 @@ var globalLogger = logger{
 	level:     LevelInfo,
 	formatter: mustNewFormatter(DefaultFormat),
 	out:       os.Stderr,
-	outMu:     sync.Mutex{},
 }
 
 func (l *logger) logf(level Level, msg string) {
