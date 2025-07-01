@@ -12,9 +12,7 @@ func TestLogf(t *testing.T) {
 
 	// Restore after tests
 	originalNow := now
-	originalOutput := output
 	defer func() { now = originalNow }()
-	defer func() { output = originalOutput }()
 
 	now = func() time.Time {
 		return time.Date(2025, time.January, 1, 0, 0, 0, 0, time.Local)
@@ -51,10 +49,10 @@ func TestLogf(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.description, func(t *testing.T) {
 			var buf bytes.Buffer
-			output = &buf
 			var exampleLogger = logger{
 				level:     tc.currentLevel,
 				formatter: mustNewFormatter(DefaultFormatNoColor),
+				out:       &buf,
 			}
 			exampleLogger.logf(tc.messageLevel, tc.message)
 			logWritten := buf.String()

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 	"time"
 )
 
 // So we can override in tests
 var (
-	now              = time.Now
-	output io.Writer = os.Stderr
+	now = time.Now
 )
 
 type Level int
@@ -34,15 +34,18 @@ const (
 type logger struct {
 	level     Level
 	formatter formatter
+	out       io.Writer
+	outMu     sync.Mutex
 }
 
 // Specific "logger" we use in all the public logging functions
 var globalLogger = logger{
 	level:     LevelInfo,
 	formatter: mustNewFormatter(DefaultFormat),
+	out:       os.Stderr,
 }
 
-func (l logger) logf(level Level, msg string) {
+func (l *logger) logf(level Level, msg string) {
 	if level < l.level {
 		return
 	}
@@ -52,7 +55,9 @@ func (l logger) logf(level Level, msg string) {
 		Time:    now(),
 		Message: msg,
 	}
-	fmt.Fprintln(output, l.formatter.format(data))
+	l.outMu.Lock()
+	defer l.outMu.Unlock()
+	fmt.Fprintln(l.out, l.formatter.format(data))
 }
 
 // --- Configuration ---
