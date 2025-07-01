@@ -2,6 +2,7 @@ package clilog
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"text/template"
 	"time"
@@ -43,8 +44,7 @@ func newFormatter(format string) (formatter, error) {
 		Message: "test message",
 	}
 
-	var b strings.Builder
-	if err := t.Execute(&b, test); err != nil {
+	if err := t.Execute(io.Discard, test); err != nil {
 		return formatter{}, fmt.Errorf("invalid template: %w", err)
 	}
 
